@@ -9,11 +9,13 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from sklearn.metrics import confusion_matrix
 
 # Load your dataset
-@st.cache
-# Use the raw URL of your dataset from GitHub
+@st.cache_data
 def load_data():
+    # Your data loading code here
     url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"
-    return pd.read_csv(url)
+    data = pd.read_csv(url)
+    return data
+
 
 # Main App
 def main():
