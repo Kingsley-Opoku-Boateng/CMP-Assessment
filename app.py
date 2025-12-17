@@ -12,7 +12,7 @@ from sklearn.metrics import confusion_matrix
 @st.cache
 # Use the raw URL of your dataset from GitHub
 def load_data():
-    url = "https://raw.githubusercontent.com/KingsleyOpokuBoateng/CMP-Assessment/main/air_quality_data.csv"
+    url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"
     return pd.read_csv(url)
 
 # Main App
