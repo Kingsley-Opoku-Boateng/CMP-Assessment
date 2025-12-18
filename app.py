@@ -234,5 +234,28 @@ def modeling():
         st.success(f"Predicted AQI Category: **{predicted_label[0]}**")
 
 
+# -------------------------------------
+# Sidebar Navigation
+# -------------------------------------
+st.sidebar.title("Navigation")
+
+page = st.sidebar.radio(
+    "Go to",
+    [
+        "Data Overview",
+        "Data Preprocessing",
+        "Exploratory Data Analysis (EDA)",
+        "Modeling and Prediction"
+    ]
+)
+
+if page == "Data Overview":
+    data_overview()
+elif page == "Data Preprocessing":
+    data_preprocessing()
+elif page == "Exploratory Data Analysis (EDA)":
+    eda()
+elif page == "Modeling and Prediction":
+    modeling()
 
 
