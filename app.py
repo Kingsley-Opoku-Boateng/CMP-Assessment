@@ -1,5 +1,5 @@
 
- import streamlit as st
+import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,7 +15,7 @@ from sklearn.impute import SimpleImputer
 # Load data
 @st.cache
 def load_data():
-    url = "https://raw.githubusercontent.com/KingsleyOpokuBoateng/CMP-Assessment/main/air_quality_data.csv"  # Use your dataset link
+    url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"  # Use your dataset link
     df = pd.read_csv(url)
     return df
 
