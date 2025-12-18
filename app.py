@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import LabelEncoder
@@ -26,22 +26,16 @@ if 'data' not in st.session_state:
 # Page 1: Data Overview
 # -------------------------------------
 def data_overview():
-    st.title("Data Overview ")
+    st.title("Data Overview")
 
-   
-  
     data = st.session_state['data']
 
     # Dataset Information
     st.header("Dataset Information")
-
     st.markdown("""
-
-    The Beijing Air Quality dataset contains hourly readings of pollutants  PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3 
-    and Volatile Organic Compounds (VOCs): Benzene, Toluene, Xylene,  Air Quality Index (AQI) and AQI_Bucket  across 26 cities.
-
-      """)
-        
+    The Beijing Air Quality dataset contains hourly readings of pollutants: PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3, 
+    and Volatile Organic Compounds (VOCs): Benzene, Toluene, Xylene, Air Quality Index (AQI) and AQI_Bucket across 26 cities.
+    """)
 
     # Preview data
     st.header("Data Preview")
@@ -66,8 +60,6 @@ def data_overview():
 # -------------------------------------
 def data_preprocessing():
     st.title("Data Preprocessing")
-
-    
 
     data = st.session_state['data']
 
@@ -135,12 +127,11 @@ def data_preprocessing():
 def eda():
     st.title("Exploratory Data Analysis (EDA)")
 
-    
     data = st.session_state['data']
 
     # Pollutant Distribution
     st.header("Pollutant Distribution")
-    pollutants = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
+    pollutants = ['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'NH3', 'CO', 'SO2', 'O3', 'Benzene', 'Toluene', 'Xylene']
     for pollutant in pollutants:
         st.subheader(f"{pollutant} Distribution")
         fig, ax = plt.subplots()
@@ -149,7 +140,7 @@ def eda():
 
     # Correlation Matrix
     st.header("Correlation Matrix")
-    corr_matrix = data[['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']].corr()
+    corr_matrix = data[['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'NH3', 'CO', 'SO2', 'O3', 'Benzene', 'Toluene', 'Xylene']].corr()
     st.write(corr_matrix)
 
     # Heatmap of Correlation
@@ -164,32 +155,44 @@ def eda():
 def modeling():
     st.title("Modeling and Prediction")
 
- 
-
     data = st.session_state['data']
 
     # Preparing Data for Modeling
     st.header("Data Preparation for Modeling")
-    features = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
+    features = ['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'NH3', 'CO', 'SO2', 'O3', 'Benzene', 'Toluene', 'Xylene']
     X = data[features]
     y = LabelEncoder().fit_transform(data['AQI_Bucket'])
 
     # Train-Test Split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Model Selection
+    # Model Selection and Training
     st.header("Modeling")
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-    def modeling():
-    st.title("Predict Air Quality (AQI)")
+    # Prediction
+    y_pred = model.predict(X_test)
 
-    # Load the pre-trained model (you can replace this with a saved model if necessary)
-    model = load_trained_model()
+    # Accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    st.write(f"Model Accuracy: {accuracy:.2f}")
 
-    # Pollutant Features for input
-    st.header("Enter Pollutant Values to Predict AQI")
+    # Classification Report
+    st.header("Model Evaluation")
+    st.write(classification_report(y_test, y_pred))
+
+    # Feature Importance
+    st.header("Feature Importance")
+    feature_importance = model.feature_importances_
+    importance_df = pd.DataFrame({
+        'Feature': features,
+        'Importance': feature_importance
+    }).sort_values(by='Importance', ascending=False)
+    st.write(importance_df)
+
+    # Pollutant Features for Prediction
+    st.header("Predict Air Quality (AQI)")
 
     # Create input fields for the user to input values
     pm25 = st.number_input("PM2.5 (µg/m³)", min_value=0.0, step=0.1)
@@ -202,36 +205,4 @@ def modeling():
     so2 = st.number_input("SO2 (µg/m³)", min_value=0.0, step=0.1)
     o3 = st.number_input("O3 (µg/m³)", min_value=0.0, step=0.1)
     benzene = st.number_input("Benzene (µg/m³)", min_value=0.0, step=0.1)
-    toluene = st.number_input("Toluene (µg/m³)", min_value=0.0, step=0.1)
-    xylene = st.number_input("Xylene (µg/m³)", min_value=0.0, step=0.1)
-
-    # Combine all inputs into a list (feature vector)
-    features = [pm25, pm10, no, no2, nox, nh3, co, so2, o3, benzene, toluene, xylene]
-
-    # Label encoder for AQI buckets (assuming you've trained your model this way)
-    label_encoder = LabelEncoder()
-    label_encoder.fit(['Good', 'Moderate', 'Unhealthy for Sensitive Groups', 'Unhealthy', 'Very Unhealthy', 'Hazardous'])
-
-    # Prediction Button
-    if st.button("Predict AQI"):
-        # Ensure we have valid input
-        if all(val >= 0 for val in features):
-            # Predict AQI based on input features
-            prediction = model.predict([features])
-
-            # Decode the prediction back to the AQI bucket
-            predicted_aqi = label_encoder.inverse_transform(prediction)
-
-            # Display result
-            st.write(f"The predicted AQI category is: **{predicted_aqi[0]}**")
-        else:
-            st.error("Please enter valid positive values for all pollutants.")
-
-# Sidebar navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Modeling and Prediction"])
-
-if page == "Modeling and Prediction":
-    modeling()
-
-
+    toluene = st.number_input("Toluene (µg/m³)", min_value=0.0, step=0.
