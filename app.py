@@ -42,7 +42,6 @@ def data_overview():
 
       """)
         
-    st.write(data.info())
 
     # Preview data
     st.header("Data Preview")
