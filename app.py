@@ -26,7 +26,7 @@ if 'data' not in st.session_state:
 # Page 1: Data Overview
 # -------------------------------------
 def data_overview():
-    st.title("Data Overview :open_file_folder:")
+    st.title("Data Overview ")
 
    
   
@@ -34,6 +34,14 @@ def data_overview():
 
     # Dataset Information
     st.header("Dataset Information")
+
+    st.markdown("""
+
+    The Beijing Air Quality dataset contains hourly readings of pollutants  PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3 
+    and Volatile Organic Compounds (VOCs): Benzene, Toluene, Xylene,  Air Quality Index (AQI) and AQI_Bucket  across 26 cities.
+
+      """)
+        
     st.write(data.info())
 
     # Preview data
@@ -81,7 +89,7 @@ def data_preprocessing():
         st.session_state['data'] = data
 
     # Feature Engineering (Adding AQI and AQI Bucket)
-    st.header("Feature Engineering :hammer_and_wrench:")
+    st.header("Feature Engineering")
     if st.checkbox("Add AQI and AQI_Bucket columns"):
         def calculate_aqi(row):
             aqi_values = {
