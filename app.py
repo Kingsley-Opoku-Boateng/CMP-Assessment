@@ -1,118 +1,93 @@
-
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
 
-# Load data
+# Caching the data loading function for faster access
 @st.cache
 def load_data():
-    url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"  # Use your dataset link
+    url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"
     df = pd.read_csv(url)
     return df
 
-df = load_data()
+# Main function for the app
+def main():
+    st.title('Air Quality Prediction App')
 
-# Sidebar for navigation
-st.sidebar.title("Air Quality Data Analysis")
-app_mode = st.sidebar.radio("Choose a page", ["Data Overview", "Exploratory Data Analysis", "Modeling and Prediction"])
+    # Load Data
+    df = load_data()
 
-if app_mode == "Data Overview":
-    st.title("Data Overview")
-    st.write("### Dataset Information")
-    st.write(df.info())  # Show dataset information
-    st.write("### First Few Rows of Data")
-    st.write(df.head())  # Show first few rows
+    # Data Overview Section
+    st.header('Data Overview')
+    st.write("Dataset Information:")
+    st.write(df.info())  # Display dataset info
+    st.write("First few rows of the dataset:")
+    st.write(df.head())  # Show the first few rows of the data
 
-elif app_mode == "Exploratory Data Analysis":
-    st.title("Exploratory Data Analysis (EDA)")
+    # Exploratory Data Analysis (EDA)
+    st.header('Exploratory Data Analysis (EDA)')
+    
+    # Average values of pollutants and VOCs
+    st.subheader('Average Pollutant and VOC Concentrations')
+    avg_pollutants = df[['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2', 'Benzene', 'Toluene', 'Xylene']].mean()
+    st.write(avg_pollutants)
 
-    # Basic statistics
-    st.write("### Dataset Summary")
-    st.write(df.describe())
+    # Display simple distributions of pollutants
+    st.subheader('Pollutant and VOC Distributions')
+    fig, axes = plt.subplots(3, 3, figsize=(15, 10))
+    axes = axes.flatten()
+    pollutants = ['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2', 'Benzene', 'Toluene', 'Xylene']
 
-    # Histograms of numerical columns
-    st.write("### Histograms of Numerical Features")
-    numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
-    for col in numeric_cols:
-        st.write(f"#### {col}")
-        st.bar_chart(df[col])
+    for i, pollutant in enumerate(pollutants):
+        sns.histplot(df[pollutant], ax=axes[i], kde=True)
+        axes[i].set_title(f'{pollutant} Distribution')
 
-    # Correlation Matrix
-    st.write("### Correlation Matrix")
-    corr_matrix = df.corr()
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", ax=ax)
     st.pyplot(fig)
 
-elif app_mode == "Modeling and Prediction":
-    st.title("Modeling and Prediction")
+    # Correlation Matrix Section
+    st.header('Correlation Between Pollutants and VOCs')
+    correlation_matrix = df[['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2', 'Benzene', 'Toluene', 'Xylene']].corr()
+    
+    # Plotting the correlation matrix as a heatmap
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f', vmin=-1, vmax=1)
+    st.pyplot()
 
-    # Select Features and Target
-    features = ['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'NH3', 'CO', 'SO2', 'O3', 'Benzene', 'Toluene', 'Xylene']
-    target = 'AQI_Bucket'
+    # Modeling and Prediction Section
+    st.header('Modeling and Prediction')
 
-    # Data Preprocessing
+    # Preprocessing the data for the model
+    df['AQI_Bucket'] = df['AQI_Bucket'].apply(LabelEncoder().fit_transform)  # Convert AQI_Bucket to numerical values
+
+    # Selecting features and target variable
+    features = ['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2', 'Benzene', 'Toluene', 'Xylene']
     X = df[features]
-    y = df[target]
+    y = df['AQI_Bucket']
 
-    # Train-Test Split
+    # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Preprocessing pipeline
-    numeric_features = X.select_dtypes(include=['float64', 'int64']).columns
-    numeric_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='mean')),
-        ('scaler', StandardScaler())
-    ])
+    # Model: Random Forest Classifier
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
 
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', numeric_transformer, numeric_features)
-        ])
+    # Making predictions
+    y_pred = model.predict(X_test)
 
-    # Create Random Forest model pipeline
-    rf_pipeline = Pipeline(steps=[
-        ('preprocessor', preprocessor),
-        ('classifier', RandomForestClassifier(random_state=42))
-    ])
-
-    # Train the model
-    st.write("Training the Random Forest model...")
-    rf_pipeline.fit(X_train, y_train)
-
-    # Predictions
-    y_pred = rf_pipeline.predict(X_test)
-
-    # Evaluation
-    st.write("### Model Evaluation")
+    # Displaying model performance
     accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"Accuracy: {accuracy:.2f}")
-    st.write("### Classification Report")
-    st.write(classification_report(y_test, y_pred))
+    st.write("Model Accuracy: ", accuracy)
+    st.write("\nClassification Report:\n", classification_report(y_test, y_pred))
 
-    # Feature Importance
-    feature_importance = rf_pipeline.named_steps['classifier'].feature_importances_
-    feature_importance_df = pd.DataFrame({
-        'Feature': features,
-        'Importance': feature_importance
-    }).sort_values(by='Importance', ascending=False)
+if __name__ == "__main__":
+    main()
 
-    st.write("### Feature Importance")
-    st.write(feature_importance_df)
+   
 
-    # Predictions on user input
-    st.write("### Make a Prediction")
-    user_input = {col: st.number_input(f'Enter value for {col}', min_value=float(df[col].min()), max_value=float(df[col].max())) for col in features}
-    user_input_df = pd.DataFrame([user_input])
-    prediction = rf_pipeline.predict(user_input_df)
-    st.write(f"Predicted AQI Bucket: {prediction[0]}")
+    
 
