@@ -14,7 +14,7 @@ st.set_page_config(page_title="Air Quality Prediction App", page_icon=":bar_char
 
 @st.cache_data
 def load_data():
-    # URL to the dataset (
+    # URL to the dataset 
     url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"
     return pd.read_csv(url)
 
@@ -152,7 +152,7 @@ def eda():
 
     # Pollutant Distribution
     st.header("Pollutant Distribution :chart_with_upwards_trend:")
-    pollutants = ['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2']
+    pollutants = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
     for pollutant in pollutants:
         st.subheader(f"{pollutant} Distribution")
         fig, ax = plt.subplots()
@@ -161,7 +161,7 @@ def eda():
 
     # Correlation Matrix
     st.header("Correlation Matrix :link:")
-    corr_matrix = data[['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2']].corr()
+    corr_matrix = data[['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene'']].corr()
     st.write(corr_matrix)
 
     # Heatmap of Correlation
@@ -187,7 +187,7 @@ def modeling():
 
     # Preparing Data for Modeling
     st.header("Data Preparation for Modeling :dart:")
-    features = ['PM2.5', 'PM10', 'NO2', 'CO', 'O3', 'SO2']
+    features = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
     X = data[features]
     y = LabelEncoder().fit_transform(data['AQI_Bucket'])
 
@@ -230,8 +230,7 @@ if page == "Data Overview":
     data_overview()
 elif page == "Data Preprocessing":
     data_preprocessing()
-elif page == "Explor
-
-   
-
-
+elif page == "Exploratory Data Analysis (EDA)":
+    eda()
+elif page == "Modeling and Prediction":
+    modeling()
