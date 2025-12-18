@@ -179,7 +179,7 @@ def modeling():
 
     # Model Selection
     st.header("Modeling")
-    model = RandomForestClassifier(n_estimators=0.20, random_state=42)
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
     # Prediction
