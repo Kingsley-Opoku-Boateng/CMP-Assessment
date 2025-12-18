@@ -233,9 +233,4 @@ def modeling():
         else:
             st.error("Please enter valid positive values for all pollutants.")
 
-# Sidebar navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Modeling and Prediction"])
 
-if page == "Modeling and Prediction":
-    modeling()
