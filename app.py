@@ -15,7 +15,7 @@ st.set_page_config(page_title="Air Quality Prediction App", page_icon=":bar_char
 @st.cache_data
 def load_data():
     # URL to the dataset (
-    url = "https://raw.githubusercontent.com/KingsleyOpokuBoateng/CMP-Assessment/main/air_quality_data.csv"
+    url = "https://raw.githubusercontent.com/Kingsley-Opoku-Boateng/CMP-Assessment/main/air_quality_data.csv"
     return pd.read_csv(url)
 
 # Load data into session state
