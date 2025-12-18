@@ -182,20 +182,14 @@ def modeling():
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-   # Define the model training function (assuming model is pre-trained and saved)
-      def load_trained_model():
-      # Here, you'll load your model (if saved). For now, we train it.
-      model = RandomForestClassifier(n_estimators=100, random_state=42)
-      return model
-
-      def modeling():
-      st.title("Predict Air Quality (AQI)")
+  def modeling():
+    st.title("Predict Air Quality (AQI)")
 
     # Load the pre-trained model (you can replace this with a saved model if necessary)
-      model = load_trained_model()
+    model = load_trained_model()
 
     # Pollutant Features for input
-     st.header("Enter Pollutant Values to Predict AQI")
+    st.header("Enter Pollutant Values to Predict AQI")
 
     # Create input fields for the user to input values
     pm25 = st.number_input("PM2.5 (µg/m³)", min_value=0.0, step=0.1)
@@ -232,5 +226,12 @@ def modeling():
             st.write(f"The predicted AQI category is: **{predicted_aqi[0]}**")
         else:
             st.error("Please enter valid positive values for all pollutants.")
+
+# Sidebar navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Modeling and Prediction"])
+
+if page == "Modeling and Prediction":
+    modeling()
 
 
