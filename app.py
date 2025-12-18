@@ -28,18 +28,12 @@ if 'data' not in st.session_state:
 def data_overview():
     st.title("Data Overview :open_file_folder:")
 
-    st.markdown("""
-    **Goal:** Let's get familiar with the dataset and understand its structure.
-
-    - **Dataset Overview**: Display basic data structure
-    - **Descriptive Statistics**: Get summary statistics
-    - **Missing Values**: Identify any missing data
-    """)
-
+   
+  
     data = st.session_state['data']
 
     # Dataset Information
-    st.header("Dataset Information :eyes:")
+    st.header("Dataset Information")
     st.write(data.info())
 
     # Preview data
@@ -48,13 +42,13 @@ def data_overview():
     st.write(data.head(num_rows))
 
     # Descriptive Statistics
-    st.header("Descriptive Statistics :clipboard:")
+    st.header("Descriptive Statistics")
     show_desc_table = st.checkbox("Show Descriptive Statistics")
     if show_desc_table:
         st.write(data.describe())
 
     # Missing values
-    st.header("Missing Values Analysis :question:")
+    st.header("Missing Values Analysis")
     missing_data = data.isnull().sum()
     missing_percentage = (missing_data / len(data)) * 100
     missing_df = pd.DataFrame({'Missing Values': missing_data, 'Percentage': missing_percentage})
@@ -64,7 +58,7 @@ def data_overview():
 # Page 2: Data Preprocessing
 # -------------------------------------
 def data_preprocessing():
-    st.title("Data Preprocessing :broom:")
+    st.title("Data Preprocessing")
 
     st.markdown("""
     **Goal:** Clean and transform the dataset into a suitable format for analysis.
@@ -77,7 +71,7 @@ def data_preprocessing():
     data = st.session_state['data']
 
     # Handle Missing Data
-    st.header("Handling Missing Data :umbrella:")
+    st.header("Handling Missing Data")
     imputation_method = st.radio("Choose imputation method:", ["Mean", "Median", "Mode"])
     columns_to_impute = st.multiselect("Select columns to impute:", data.columns)
 
@@ -174,19 +168,14 @@ def eda():
 # Page 4: Modeling and Prediction
 # -------------------------------------
 def modeling():
-    st.title("Modeling and Prediction :robot_face:")
+    st.title("Modeling and Prediction")
 
-    st.markdown("""
-    **Goal:** Build and evaluate a model to predict AQI Bucket.
-
-    - **Random Forest Classifier Model**
-    - **Evaluation Metrics**
-    """)
+ 
 
     data = st.session_state['data']
 
     # Preparing Data for Modeling
-    st.header("Data Preparation for Modeling :dart:")
+    st.header("Data Preparation for Modeling")
     features = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
     X = data[features]
     y = LabelEncoder().fit_transform(data['AQI_Bucket'])
@@ -207,7 +196,7 @@ def modeling():
     st.write(f"Model Accuracy: {accuracy:.2f}")
 
     # Classification Report
-    st.header("Model Evaluation :memo:")
+    st.header("Model Evaluation")
     st.write(classification_report(y_test, y_pred))
 
     # Feature Importance
@@ -222,7 +211,7 @@ def modeling():
 # -------------------------------------
 # Sidebar Navigation
 # -------------------------------------
-st.sidebar.title("Navigation :compass:")
+st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Data Overview", "Data Preprocessing", "Exploratory Data Analysis (EDA)", "Modeling and Prediction"])
 
 # Page navigation logic
