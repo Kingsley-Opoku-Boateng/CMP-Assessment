@@ -182,38 +182,60 @@ def modeling():
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-    # Prediction
-    y_pred = model.predict(X_test)
+# Define the model training function (assuming model is pre-trained and saved)
+def load_trained_model():
+    # Here, you'll load your model (if saved). For now, we train it.
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    return model
 
-    # Accuracy
-    accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"Model Accuracy: {accuracy:.2f}")
+def modeling():
+    st.title("Predict Air Quality (AQI)")
 
-    # Classification Report
-    st.header("Model Evaluation")
-    st.write(classification_report(y_test, y_pred))
+    # Load the pre-trained model (you can replace this with a saved model if necessary)
+    model = load_trained_model()
 
-    # Feature Importance
-    st.header("Feature Importance")
-    feature_importance = model.feature_importances_
-    importance_df = pd.DataFrame({
-        'Feature': features,
-        'Importance': feature_importance
-    }).sort_values(by='Importance', ascending=False)
-    st.write(importance_df)
+    # Pollutant Features for input
+    st.header("Enter Pollutant Values to Predict AQI")
 
-# -------------------------------------
-# Sidebar Navigation
-# -------------------------------------
+    # Create input fields for the user to input values
+    pm25 = st.number_input("PM2.5 (µg/m³)", min_value=0.0, step=0.1)
+    pm10 = st.number_input("PM10 (µg/m³)", min_value=0.0, step=0.1)
+    no = st.number_input("NO (µg/m³)", min_value=0.0, step=0.1)
+    no2 = st.number_input("NO2 (µg/m³)", min_value=0.0, step=0.1)
+    nox = st.number_input("NOx (µg/m³)", min_value=0.0, step=0.1)
+    nh3 = st.number_input("NH3 (µg/m³)", min_value=0.0, step=0.1)
+    co = st.number_input("CO (µg/m³)", min_value=0.0, step=0.1)
+    so2 = st.number_input("SO2 (µg/m³)", min_value=0.0, step=0.1)
+    o3 = st.number_input("O3 (µg/m³)", min_value=0.0, step=0.1)
+    benzene = st.number_input("Benzene (µg/m³)", min_value=0.0, step=0.1)
+    toluene = st.number_input("Toluene (µg/m³)", min_value=0.0, step=0.1)
+    xylene = st.number_input("Xylene (µg/m³)", min_value=0.0, step=0.1)
+
+    # Combine all inputs into a list (feature vector)
+    features = [pm25, pm10, no, no2, nox, nh3, co, so2, o3, benzene, toluene, xylene]
+
+    # Label encoder for AQI buckets (assuming you've trained your model this way)
+    label_encoder = LabelEncoder()
+    label_encoder.fit(['Good', 'Moderate', 'Unhealthy for Sensitive Groups', 'Unhealthy', 'Very Unhealthy', 'Hazardous'])
+
+    # Prediction Button
+    if st.button("Predict AQI"):
+        # Ensure we have valid input
+        if all(val >= 0 for val in features):
+            # Predict AQI based on input features
+            prediction = model.predict([features])
+
+            # Decode the prediction back to the AQI bucket
+            predicted_aqi = label_encoder.inverse_transform(prediction)
+
+            # Display result
+            st.write(f"The predicted AQI category is: **{predicted_aqi[0]}**")
+        else:
+            st.error("Please enter valid positive values for all pollutants.")
+
+# Sidebar navigation
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Data Overview", "Data Preprocessing", "Exploratory Data Analysis (EDA)", "Modeling and Prediction"])
+page = st.sidebar.radio("Go to", ["Modeling and Prediction"])
 
-# Page navigation logic
-if page == "Data Overview":
-    data_overview()
-elif page == "Data Preprocessing":
-    data_preprocessing()
-elif page == "Exploratory Data Analysis (EDA)":
-    eda()
-elif page == "Modeling and Prediction":
+if page == "Modeling and Prediction":
     modeling()
