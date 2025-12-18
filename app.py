@@ -182,7 +182,7 @@ def modeling():
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-  def modeling():
+    def modeling():
     st.title("Predict Air Quality (AQI)")
 
     # Load the pre-trained model (you can replace this with a saved model if necessary)
