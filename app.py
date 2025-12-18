@@ -149,6 +149,7 @@ def eda():
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
     st.pyplot(fig)
 
+
 # -------------------------------------
 # Page 4: Modeling and Prediction
 # -------------------------------------
@@ -157,52 +158,81 @@ def modeling():
 
     data = st.session_state['data']
 
-    # Preparing Data for Modeling
-    st.header("Data Preparation for Modeling")
-    features = ['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'NH3', 'CO', 'SO2', 'O3', 'Benzene', 'Toluene', 'Xylene']
-    X = data[features]
-    y = LabelEncoder().fit_transform(data['AQI_Bucket'])
+    # -------------------------------
+    # Prepare data
+    # -------------------------------
+    st.header("Model Training")
 
-    # Train-Test Split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    features = [
+        'PM2.5', 'PM10', 'NO', 'NO2', 'NOx',
+        'NH3', 'CO', 'SO2', 'O3',
+        'Benzene', 'Toluene', 'Xylene'
+    ]
 
-    # Model Selection and Training
-    st.header("Modeling")
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    # Drop rows with missing values (simple & fast)
+    model_data = data[features + ['AQI_Bucket']].dropna()
+
+    X = model_data[features]
+    y = model_data['AQI_Bucket']
+
+    # Encode target
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y)
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=0.2, random_state=42
+    )
+
+    # Train model
+    model = RandomForestClassifier(
+        n_estimators=100,
+        random_state=42,
+        n_jobs=-1
+    )
     model.fit(X_train, y_train)
 
-    # Prediction
+    # Evaluate
     y_pred = model.predict(X_test)
-
-    # Accuracy
     accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"Model Accuracy: {accuracy:.2f}")
 
-    # Classification Report
-    st.header("Model Evaluation")
-    st.write(classification_report(y_test, y_pred))
+    st.success(f"Model Accuracy: {accuracy:.2f}")
 
-    # Feature Importance
-    st.header("Feature Importance")
-    feature_importance = model.feature_importances_
-    importance_df = pd.DataFrame({
-        'Feature': features,
-        'Importance': feature_importance
-    }).sort_values(by='Importance', ascending=False)
-    st.write(importance_df)
+    st.subheader("Classification Report")
+    st.text(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
 
-    # Pollutant Features for Prediction
-    st.header("Predict Air Quality (AQI)")
+    # -------------------------------
+    # Prediction Section
+    # -------------------------------
+    st.header("Predict AQI Category")
 
-    # Create input fields for the user to input values
-    pm25 = st.number_input("PM2.5 (µg/m³)", min_value=0.0, step=0.1)
-    pm10 = st.number_input("PM10 (µg/m³)", min_value=0.0, step=0.1)
-    no = st.number_input("NO (µg/m³)", min_value=0.0, step=0.1)
-    no2 = st.number_input("NO2 (µg/m³)", min_value=0.0, step=0.1)
-    nox = st.number_input("NOx (µg/m³)", min_value=0.0, step=0.1)
-    nh3 = st.number_input("NH3 (µg/m³)", min_value=0.0, step=0.1)
-    co = st.number_input("CO (µg/m³)", min_value=0.0, step=0.1)
-    so2 = st.number_input("SO2 (µg/m³)", min_value=0.0, step=0.1)
-    o3 = st.number_input("O3 (µg/m³)", min_value=0.0, step=0.1)
-    benzene = st.number_input("Benzene (µg/m³)", min_value=0.0, step=0.1)
-    toluene = st.number_input("Toluene (µg/m³)", min_value=0.0, step=0.
+    st.write("Enter pollutant and VOC values below:")
+
+    pm25 = st.number_input("PM2.5 (µg/m³)", 0.0)
+    pm10 = st.number_input("PM10 (µg/m³)", 0.0)
+    no = st.number_input("NO (µg/m³)", 0.0)
+    no2 = st.number_input("NO2 (µg/m³)", 0.0)
+    nox = st.number_input("NOx (µg/m³)", 0.0)
+    nh3 = st.number_input("NH3 (µg/m³)", 0.0)
+    co = st.number_input("CO (µg/m³)", 0.0)
+    so2 = st.number_input("SO2 (µg/m³)", 0.0)
+    o3 = st.number_input("O3 (µg/m³)", 0.0)
+    benzene = st.number_input("Benzene (µg/m³)", 0.0)
+    toluene = st.number_input("Toluene (µg/m³)", 0.0)
+    xylene = st.number_input("Xylene (µg/m³)", 0.0)
+
+    input_data = np.array([[
+        pm25, pm10, no, no2, nox,
+        nh3, co, so2, o3,
+        benzene, toluene, xylene
+    ]])
+
+    if st.button("Predict AQI"):
+        prediction = model.predict(input_data)
+        predicted_label = label_encoder.inverse_transform(prediction)
+
+        st.success(f"Predicted AQI Category: **{predicted_label[0]}**")
+
+
+
+
