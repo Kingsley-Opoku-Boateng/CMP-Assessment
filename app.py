@@ -182,13 +182,13 @@ def modeling():
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-# Define the model training function (assuming model is pre-trained and saved)
-def load_trained_model():
+   # Define the model training function (assuming model is pre-trained and saved)
+    def load_trained_model():
     # Here, you'll load your model (if saved). For now, we train it.
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     return model
 
-def modeling():
+    def modeling():
     st.title("Predict Air Quality (AQI)")
 
     # Load the pre-trained model (you can replace this with a saved model if necessary)
