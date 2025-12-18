@@ -37,7 +37,7 @@ def data_overview():
     st.write(data.info())
 
     # Preview data
-    st.header("Data Preview :mag:")
+    st.header("Data Preview")
     num_rows = st.slider("Select number of rows to preview:", 1, 100, 10)
     st.write(data.head(num_rows))
 
@@ -60,13 +60,7 @@ def data_overview():
 def data_preprocessing():
     st.title("Data Preprocessing")
 
-    st.markdown("""
-    **Goal:** Clean and transform the dataset into a suitable format for analysis.
-
-    - **Handle Missing Data**
-    - **Feature Engineering** (Adding AQI, AQI_Bucket)
-    - **Drop Unnecessary Columns**
-    """)
+    
 
     data = st.session_state['data']
 
@@ -121,7 +115,7 @@ def data_preprocessing():
         st.session_state['data'] = data
 
     # Drop Unnecessary Columns
-    st.header("Dropping Columns :wastebasket:")
+    st.header("Dropping Columns")
     columns_to_drop = st.multiselect("Select columns to drop:", data.columns)
     if st.button("Drop Columns"):
         data.drop(columns=columns_to_drop, inplace=True)
@@ -132,20 +126,13 @@ def data_preprocessing():
 # Page 3: Exploratory Data Analysis (EDA)
 # -------------------------------------
 def eda():
-    st.title("Exploratory Data Analysis (EDA) :bar_chart:")
+    st.title("Exploratory Data Analysis (EDA)")
 
-    st.markdown("""
-    **Goal:** Explore the dataset through visualizations.
-
-    - **Pollutant Distribution**
-    - **Correlation Matrix**
-    - **Pollutant Comparison**
-    """)
-
+    
     data = st.session_state['data']
 
     # Pollutant Distribution
-    st.header("Pollutant Distribution :chart_with_upwards_trend:")
+    st.header("Pollutant Distribution")
     pollutants = ['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']
     for pollutant in pollutants:
         st.subheader(f"{pollutant} Distribution")
@@ -154,12 +141,12 @@ def eda():
         st.pyplot(fig)
 
     # Correlation Matrix
-    st.header("Correlation Matrix :link:")
+    st.header("Correlation Matrix")
     corr_matrix = data[['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']].corr()
     st.write(corr_matrix)
 
     # Heatmap of Correlation
-    st.header("Correlation Heatmap :flame:")
+    st.header("Correlation Heatmap")
     fig = plt.figure(figsize=(10, 6))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
     st.pyplot(fig)
@@ -184,7 +171,7 @@ def modeling():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Model Selection
-    st.header("Modeling :gear:")
+    st.header("Modeling")
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
@@ -200,7 +187,7 @@ def modeling():
     st.write(classification_report(y_test, y_pred))
 
     # Feature Importance
-    st.header("Feature Importance :zap:")
+    st.header("Feature Importance")
     feature_importance = model.feature_importances_
     importance_df = pd.DataFrame({
         'Feature': features,
