@@ -161,7 +161,7 @@ def eda():
 
     # Correlation Matrix
     st.header("Correlation Matrix :link:")
-    corr_matrix = data[['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene'']].corr()
+    corr_matrix = data[['PM2.5', 'PM10', 'NO','NO2', 'NOx', 'NH3','CO','SO2','O3','Benzene', 'Toluene', 'Xylene']].corr()
     st.write(corr_matrix)
 
     # Heatmap of Correlation
